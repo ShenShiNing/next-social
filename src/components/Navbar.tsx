@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import MobileMenu from "./MobileMenu"
+import MobileMenu from "@/components/MobileMenu"
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 
 const Navbar = () => {
