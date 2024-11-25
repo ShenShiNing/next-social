@@ -1,54 +1,42 @@
+import prisma from "@/lib/client"
+import { useUser } from "@clerk/nextjs"
+import { auth } from "@clerk/nextjs/server"
 import Image from "next/image"
+import StoryList from "./StoryList"
 
-const Stories = () => {
+const Stories = async () => {
+
+  const {userId: currentUserId} = await auth()
+
+  if (!currentUserId) return null;
+  const stories = await prisma.story.findMany({
+    where: {
+      expiresAt:{
+        gt: new Date(),
+      },
+      OR: [
+        {
+          user: {
+            followers: {
+              some: {
+                followerId: currentUserId,
+              }
+            }
+          }
+        },
+        {
+          userId: currentUserId,
+        }
+      ]
+    },
+    include: {
+      user: true
+    }
+  })
   return (
     <div className="p-4 bg-white rounded-lg shadow-md overflow-scroll text-sm scrollbar-hide">
       <div className="flex gap-8 w-max">
-        {/* STORIES */}
-        <div className="flex flex-col items-center gap-2 cursor-pointer">
-          <Image src="https://images.pexels.com/photos/28958306/pexels-photo-28958306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="avatar" width={80} height={80} className="w-20 h-20 rounded-full ring-2" />
-          <span className="font-medium">Ricky</span>
-        </div>
-        {/* STORIES */}
-        <div className="flex flex-col items-center gap-2 cursor-pointer">
-          <Image src="https://images.pexels.com/photos/28958306/pexels-photo-28958306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="avatar" width={80} height={80} className="w-20 h-20 rounded-full ring-2" />
-          <span className="font-medium">Ricky</span>
-        </div>
-        {/* STORIES */}
-        <div className="flex flex-col items-center gap-2 cursor-pointer">
-          <Image src="https://images.pexels.com/photos/28958306/pexels-photo-28958306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="avatar" width={80} height={80} className="w-20 h-20 rounded-full ring-2" />
-          <span className="font-medium">Ricky</span>
-        </div>
-        {/* STORIES */}
-        <div className="flex flex-col items-center gap-2 cursor-pointer">
-          <Image src="https://images.pexels.com/photos/28958306/pexels-photo-28958306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="avatar" width={80} height={80} className="w-20 h-20 rounded-full ring-2" />
-          <span className="font-medium">Ricky</span>
-        </div>
-        {/* STORIES */}
-        <div className="flex flex-col items-center gap-2 cursor-pointer">
-          <Image src="https://images.pexels.com/photos/28958306/pexels-photo-28958306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="avatar" width={80} height={80} className="w-20 h-20 rounded-full ring-2" />
-          <span className="font-medium">Ricky</span>
-        </div>
-        {/* STORIES */}
-        <div className="flex flex-col items-center gap-2 cursor-pointer">
-          <Image src="https://images.pexels.com/photos/28958306/pexels-photo-28958306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="avatar" width={80} height={80} className="w-20 h-20 rounded-full ring-2" />
-          <span className="font-medium">Ricky</span>
-        </div>
-        {/* STORIES */}
-        <div className="flex flex-col items-center gap-2 cursor-pointer">
-          <Image src="https://images.pexels.com/photos/28958306/pexels-photo-28958306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="avatar" width={80} height={80} className="w-20 h-20 rounded-full ring-2" />
-          <span className="font-medium">Ricky</span>
-        </div>
-        {/* STORIES */}
-        <div className="flex flex-col items-center gap-2 cursor-pointer">
-          <Image src="https://images.pexels.com/photos/28958306/pexels-photo-28958306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="avatar" width={80} height={80} className="w-20 h-20 rounded-full ring-2" />
-          <span className="font-medium">Ricky</span>
-        </div>
-        {/* STORIES */}
-        <div className="flex flex-col items-center gap-2 cursor-pointer">
-          <Image src="https://images.pexels.com/photos/28958306/pexels-photo-28958306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="avatar" width={80} height={80} className="w-20 h-20 rounded-full ring-2" />
-          <span className="font-medium">Ricky</span>
-        </div>
+        <StoryList stories={stories} userId={currentUserId} />
       </div>
     </div>
   )
